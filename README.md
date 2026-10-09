@@ -42,15 +42,12 @@ web-tools-library/
 ```
 ## 用AI新增工具-Use AI to Create a New Tool
 
-1. 确定工具名称和英文文件名，例如“CSV 转 JSON”使用 `csv-to-json.html`。
-
-2. 使用本帮助页后面的 AI 提示词生成完整 HTML 文件。
-
-3. 把生成的文件保存到 `tools/csv-to-json.html`。
-
-4. 打开 `index.html`，找到 `const tools = [ ... ]` 工具配置数组。
-
-5. 在数组中新增一项，保存首页并刷新浏览器。
+1. 在 `tools/` 目录下新增一个独立的 HTML 文件。
+2. 打开 `index.html`，在 `tools` 数组中仿照已有条目增加对应配置。
+3. 如需新分类，在 `categories` 数组中添加分类名称。
+4. 确保工具配置中的 `category` 与分类名称完全一致。
+5. 保存后，在浏览器中打开 `index.html`，测试工具链接和功能。
+6. 如果你不想手动改代码，可以把 `index.html` 和 `help.html` 一起发给 AI，让 AI 帮你把新工具加入首页。
 
 ### 新增示例-Add tool Example
 
@@ -241,22 +238,7 @@ const categories = [
 请先理解以上功能要求，再按照固定格式要求生成完整、可运行的独立 HTML 文件。不要修改首页。
 ```
 
-
-
-
-
-
-## Add a New Tool
-
-1. 在 `tools/` 目录下新增一个独立的 HTML 文件。
-2. 打开 `index.html`，在 `tools` 数组中仿照已有条目增加对应配置。
-3. 如需新分类，在 `categories` 数组中添加分类名称。
-4. 确保工具配置中的 `category` 与分类名称完全一致。
-5. 保存后，在浏览器中打开 `index.html`，测试工具链接和功能。
-6. 如果你不想手动改代码，可以把 `index.html` 和 `help.html` 一起发给 AI，让 AI 帮你把新工具加入首页。
-
 详细说明请查看 `help.html`。
-
 
 
 ## License
