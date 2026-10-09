@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>网页工具库 - 使用帮助</title>
+  <style>
+    :root { --primary:#2563eb; --bg:#f4f8fd; --text:#172b4d; --muted:#64748b; --border:#dce8f8; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font-family:"Microsoft YaHei","PingFang SC",Arial,sans-serif; line-height:1.75; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:22px 5%; background:#f8fbff; border-bottom:1px solid var(--border); }
+    h1 { margin:0; font-size:clamp(23px,3vw,30px); }
+    .home { display:inline-block; padding:9px 15px; border:1px solid #93baff; border-radius:9px; background:white; color:var(--primary); text-decoration:none; font-weight:600; white-space:nowrap; }
+    main { max-width:1000px; margin:0 auto; padding:28px 5% 50px; }
+    .intro, section { margin-bottom:20px; padding:24px; border:1px solid var(--border); border-radius:14px; background:white; }
+    h2 { margin:0 0 14px; font-size:22px; }
+    h3 { margin:20px 0 8px; font-size:17px; }
+    p { margin:8px 0; }
+    ul,ol { padding-left:24px; }
+    code, pre { font-family:Consolas, "Courier New", monospace; }
+    code { padding:2px 5px; border-radius:4px; background:#eff6ff; overflow-wrap:anywhere; }
+    pre { overflow-x:auto; padding:16px; border-radius:9px; background:#0f172a; color:#e2e8f0; line-height:1.55; font-size:13px; }
+    .tip { padding:12px 15px; border-left:4px solid #60a5fa; border-radius:6px; background:#eff6ff; }
+    .prompt { white-space:pre-wrap; overflow-wrap:anywhere; padding:18px; border:1px solid var(--border); border-radius:10px; background:#f8fafc; font-size:14px; }
+    .copy { margin-top:10px; padding:10px 14px; border:0; border-radius:8px; background:var(--primary); color:white; cursor:pointer; font-size:14px; }
+    footer { padding:22px; color:var(--muted); text-align:center; font-size:12px; }
+    @media(max-width:600px) { header { padding:18px 4%; } main { padding:20px 4% 36px; } .intro,section { padding:18px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>网页工具库 · 使用帮助</h1>
+    <a class="home" href="index.html">← 首页</a>
+  </header>
+
+  <main>
+    <div class="intro">
+      <h2>如何维护网页工具库</h2>
+      <p>本工具库采用“一个首页 + 多个独立工具 HTML 文件”的方式。首页负责展示分类和工具入口；每个工具单独保存，互不依赖。</p>
+      <p><strong>基本原则：</strong>AI 负责生成具体工具页面，你手动维护首页的分类和工具入口。除非明确要求，否则不要让 AI 重写整个首页。</p>
+    </div>
+
+    <section>
+      <h2>一、推荐文件结构</h2>
+      <pre>网页工具库/
+├── index.html              首页（手动维护）
+├── help.html               本帮助页面
+└── tools/
+    ├── json-formatter.html
+    ├── timestamp-converter.html
+    ├── text-diff.html
+    └── 其他工具.html</pre>
+      <p>先创建 <code>tools</code> 文件夹。首页和帮助页面放在根目录，所有具体工具放进 <code>tools</code> 文件夹。将整个文件夹复制到其他电脑时，要保持目录结构不变。</p>
+      <p class="tip">首页中的示例工具链接只是入口配置。如果对应的工具 HTML 文件尚未创建，点击后会显示找不到文件；你可以逐个让 AI 生成，也可以删除暂时不用的入口。</p>
+    </section>
+
+    <section>
+      <h2>二、如何新增工具</h2>
+      <ol>
+        <li>确定工具名称和英文文件名，例如“CSV 转 JSON”使用 <code>csv-to-json.html</code>。</li>
+        <li>使用本帮助页后面的 AI 提示词生成完整 HTML 文件。</li>
+        <li>把生成的文件保存到 <code>tools/csv-to-json.html</code>。</li>
+        <li>打开 <code>index.html</code>，找到 <code>const tools = [ ... ]</code> 工具配置数组。</li>
+        <li>在数组中新增一项，保存首页并刷新浏览器。</li>
+      </ol>
+      <p>新增工具配置示例：</p>
+      <pre>{
+  name: "CSV 转 JSON",
+  category: "数据处理",
+  icon: "🔄",
+  description: "将 CSV 表格文本转换为 JSON 数据。",
+  href: "tools/csv-to-json.html"
+}</pre>
+      <p>字段说明：</p>
+      <ul>
+        <li><code>name</code>：首页显示的工具名称。</li>
+        <li><code>category</code>：该工具所属分类，必须与分类列表中的名称完全一致。</li>
+        <li><code>icon</code>：卡片图标，可以使用 Emoji。</li>
+        <li><code>description</code>：首页卡片的简短说明。</li>
+        <li><code>href</code>：工具页面的相对路径，文件名必须完全匹配。</li>
+      </ul>
+      <p class="tip">注意 JavaScript 语法：数组中相邻的对象之间需要逗号，最后一项末尾的逗号通常可以省略。不要把新对象放在数组外面。</p>
+    </section>
+
+    <section>
+      <h2>三、如何新增分类</h2>
+      <p>打开 <code>index.html</code>，找到 <code>const categories = [ ... ]</code>，添加分类名称即可。例如：</p>
+      <pre>const categories = [
+  "文本处理",
+  "数据处理",
+  "开发辅助",
+  "文件工具",
+  "图像处理",
+  "视频工具"
+];</pre>
+      <p>之后在新工具配置中使用完全相同的分类名称：</p>
+      <pre>{
+  name: "视频信息查看",
+  category: "视频工具",
+  icon: "🎬",
+  description: "查看视频文件的基本信息。",
+  href: "tools/video-info.html"
+}</pre>
+      <p>分类按钮会自动生成，不需要手动编写按钮 HTML。新增分类后，至少要有一个工具的 <code>category</code> 使用该名称，筛选该分类时才会看到工具。</p>
+    </section>
+
+    <section>
+      <h2>四、生成工具时使用的固定提示词</h2>
+      <p>每次让 AI 生成工具时，先发送以下“格式要求”，再发送下一节的“功能要求”。这能尽量保持所有工具页面风格一致。</p>
+      <div class="prompt" id="formatPrompt">请为我的「网页工具库」生成一个独立的工具 HTML 页面，并严格遵守以下要求：
+
+1. 文件与技术要求
+- 只生成一个完整、可独立运行的 HTML 文件。
+- 使用原生 HTML、CSS、JavaScript，不使用 React、Vue 等框架。
+- 不依赖后端、数据库、Node.js、构建工具、第三方 CDN 或外部网络资源。
+- 所有必要代码都写在同一个 HTML 文件中。
+- 支持 Windows 和 Linux 上的常见现代浏览器，优先支持本地直接打开。
+- 如果浏览器安全限制导致某项功能无法在 file:// 下使用，必须明确说明并优先提供不依赖服务器的实现。
+
+2. 页面布局
+- 页面顶部必须显示标题「网页工具库」。
+- 页面顶部左上角或导航区域必须有明显的「首页」按钮。
+- 点击「首页」跳转到 ../index.html，因为工具文件统一放在 tools 文件夹中。
+- 内容区展示工具名称、操作区、结果区和必要说明。
+- 使用简洁、清晰、现代的工具型界面：浅色背景、白色卡片、蓝色强调色、适度圆角和留白。
+- 使用系统字体，保证中文正常显示；适配电脑和手机屏幕。
+- 输入、输出、按钮、提示和错误信息应清晰区分。
+
+3. 交互要求
+- 所有按钮必须实现真实功能，不得只有界面没有逻辑。
+- 输入、处理、结果展示的流程必须清晰。
+- 实现合理的输入校验、异常处理、边界值处理和操作反馈。
+- 涉及复制、下载、导入或导出时，按功能要求实现；不要添加无意义按钮。
+- 受到浏览器权限、file:// 安全策略或本地资源限制的功能，必须明确说明，不能假装已经实现。
+
+4. 代码质量与安全
+- 代码结构清楚，变量和函数命名有意义，关键逻辑添加必要的中文注释。
+- 处理空输入、非法输入、边界值和异常情况。
+- 不使用 eval 执行用户输入，不将用户输入直接拼接为不安全的 HTML。
+- 不上传用户数据，不调用外部接口，除非功能要求明确提出。
+- 不得虚构处理结果，不留下未实现的核心功能、TODO 或伪代码。
+- 避免无必要的复杂封装，优先保证可维护、可调试。
+
+5. 输出要求
+- 先给出建议的英文文件名，例如 csv-to-json.html。
+- 然后提供完整 HTML 源代码，不得省略代码或用“其余代码同上”代替。
+- 简要说明保存文件的目录和测试方法。
+- 除非我明确要求，否则不要修改首页 index.html，不要要求我重写整个工具库。
+- 若有无法在纯本地 HTML 环境实现的功能，必须指出原因和替代方案。
+
+请严格遵守上述要求，并在此基础上实现我接下来描述的具体功能。</div>
+      <button class="copy" onclick="copyPrompt('formatPrompt', this)">复制格式要求</button>
+    </section>
+
+    <section>
+      <h2>五、每次填写的功能要求模板</h2>
+      <p>将下方模板复制后，把方括号中的内容改成你的实际需求。</p>
+      <div class="prompt" id="featurePrompt">本次工具名称：【填写工具名称】
+
+建议文件名：【填写英文文件名.html】
+
+一、工具用途
+【描述工具解决什么问题、使用场景是什么。】
+
+二、输入内容
+【说明用户输入什么内容、数据或文件，输入格式是什么。】
+
+三、核心功能
+1. 【功能一】
+2. 【功能二】
+3. 【功能三】
+
+四、操作流程
+【说明用户按照什么步骤使用工具。】
+
+五、输出结果
+【说明输出内容、格式、显示方式，以及是否需要复制或下载。】
+
+六、异常处理与边界条件
+【说明空输入、非法数据、特殊字符、大文件等情况如何处理。】
+
+七、其他要求
+【填写算法规则、性能要求、界面细节或测试用例；没有则写“无”。】
+
+请先理解以上功能要求，再按照固定格式要求生成完整、可运行的独立 HTML 文件。不要修改首页。</div>
+      <button class="copy" onclick="copyPrompt('featurePrompt', this)">复制功能要求模板</button>
+    </section>
+
+    <section>
+      <h2>六、示例：JSON 格式化工具的功能要求</h2>
+      <div class="prompt" id="examplePrompt">本次工具名称：JSON 格式化工具
+建议文件名：json-formatter.html
+
+一、工具用途
+用于开发过程中快速格式化、校验和查看 JSON 数据。
+
+二、输入内容
+提供一个多行文本输入框，用户可以粘贴 JSON 字符串。
+
+三、核心功能
+1. 格式化：将合法 JSON 转换为带缩进、便于阅读的格式。
+2. 压缩：将 JSON 转换为紧凑的单行格式。
+3. 校验：判断输入是否为合法 JSON，并显示错误信息。
+4. 复制：复制处理后的结果。
+5. 清空：清空输入和输出区域。
+
+四、操作流程
+用户粘贴 JSON，选择格式化、压缩或校验，工具处理后在结果区域显示内容或错误信息。
+
+五、输出结果
+结果显示在独立的多行文本区域。提供复制按钮，并清楚显示操作是否成功。
+
+六、异常处理与边界条件
+- 输入为空时给出提示。
+- JSON 格式错误时显示可理解的错误信息。
+- 正确处理中文、Unicode、转义字符、嵌套数组和对象。
+- 不得把非法 JSON 自动修复后冒充校验成功。
+
+七、其他要求
+采用左右分栏布局，左侧输入、右侧输出；手机屏幕上改为上下布局。全部操作在浏览器本地完成，不上传数据。</div>
+      <button class="copy" onclick="copyPrompt('examplePrompt', this)">复制 JSON 示例</button>
+    </section>
+
+    <section>
+      <h2>七、推荐工作流程</h2>
+      <ol>
+        <li>先明确工具的输入、处理逻辑、输出和异常情况。</li>
+        <li>把固定格式要求和本次功能要求一起发给 AI。</li>
+        <li>把生成的 HTML 保存到 <code>tools</code> 文件夹，使用约定的英文文件名。</li>
+        <li>测试正常输入、异常输入、复制/下载等功能。</li>
+        <li>在 <code>index.html</code> 的工具数组中增加入口；只有新增分类时才修改分类数组。</li>
+      </ol>
+      <p class="tip">本地文本处理、JSON 转换、时间戳计算通常可以直接运行；读取本地文件、访问摄像头、跨文件读取数据等功能可能受到浏览器安全限制。遇到这类需求，应在功能要求中说明使用场景，并让 AI 明确验证本地运行方案。</p>
+    </section>
+  </main>
+  <footer>网页工具库 · 使用帮助</footer>
+  <script>
+    async function copyPrompt(id, button) {
+      const text = document.getElementById(id).innerText;
+      try {
+        await navigator.clipboard.writeText(text);
+        const oldText = button.textContent;
+        button.textContent = "已复制";
+        setTimeout(() => button.textContent = oldText, 1600);
+      } catch (error) {
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.style.position = "fixed";
+        area.style.opacity = "0";
+        document.body.appendChild(area);
+        area.select();
+        const ok = document.execCommand("copy");
+        area.remove();
+        button.textContent = ok ? "已复制" : "请手动选择复制";
+        setTimeout(() => button.textContent = "复制", 1800);
+      }
+    }
+  </script>
+</body>
+</html>
