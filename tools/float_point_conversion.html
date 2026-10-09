@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>进制转换（浮点数）- 网页工具库</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    background: #f1f5f9;
+    color: #1e293b;
+    line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* ---------- 顶栏 ---------- */
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 12px 18px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .home-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 16px;
+    background: #2563eb;
+    color: #ffffff;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background .15s;
+  }
+  .home-btn:hover { background: #1d4ed8; }
+  .topbar h1 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    color: #0f172a;
+  }
+
+  /* ---------- 布局 ---------- */
+  main {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 20px 16px 64px;
+  }
+  .card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .06);
+  }
+  .card + .card { margin-top: 16px; }
+  h2 {
+    font-size: 18px;
+    margin: 0 0 6px;
+    color: #0f172a;
+  }
+  .desc {
+    margin: 0 0 16px;
+    font-size: 13px;
+    color: #64748b;
+  }
+
+  /* ---------- 分组 ---------- */
+  .group {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+  .group:last-of-type { margin-bottom: 0; }
+  .group-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2563eb;
+    margin-bottom: 10px;
+  }
+  .tag {
+    font-size: 11px;
+    font-weight: 500;
+    background: #dbeafe;
+    color: #1d4ed8;
+    padding: 1px 8px;
+    border-radius: 999px;
+  }
+
+  /* ---------- 行 ---------- */
+  .row {
+    display: grid;
+    grid-template-columns: 128px 1fr auto;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .row:last-child { margin-bottom: 0; }
+  .row label {
+    font-size: 13px;
+    color: #475569;
+    white-space: nowrap;
+  }
+  .row input {
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 14px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas,
+                 "Liberation Mono", "Courier New", monospace;
+    color: #0f172a;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .row input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .15);
+  }
+  .row input::placeholder { color: #94a3b8; }
+
+  .copy-btn {
+    padding: 7px 12px;
+    font-size: 13px;
+    color: #334155;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .15s, border-color .15s;
+  }
+  .copy-btn:hover { background: #f1f5f9; border-color: #94a3b8; }
+  .copy-btn:active { background: #e2e8f0; }
+
+  /* ---------- 按钮与状态 ---------- */
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .btn {
+    padding: 8px 18px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+  }
+  .btn-primary { background: #2563eb; color: #ffffff; }
+  .btn-primary:hover { background: #1d4ed8; }
+  .btn-ghost { background: #ffffff; color: #334155; border-color: #cbd5e1; }
+  .btn-ghost:hover { background: #f1f5f9; border-color: #94a3b8; }
+
+  .status {
+    margin-top: 12px;
+    font-size: 13px;
+    min-height: 20px;
+    word-break: break-all;
+  }
+  .status.ok { color: #15803d; }
+  .status.error { color: #dc2626; }
+  .status.warn { color: #b45309; }
+
+  /* ---------- 说明区 ---------- */
+  .notes ul {
+    margin: 8px 0 0;
+    padding-left: 20px;
+  }
+  .notes li {
+    font-size: 13px;
+    color: #475569;
+    margin-bottom: 6px;
+  }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    background: #f1f5f9;
+    color: #0f172a;
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+
+  /* ---------- 小屏适配 ---------- */
+  @media (max-width: 640px) {
+    .topbar { padding: 10px 12px; gap: 10px; }
+    .topbar h1 { font-size: 16px; }
+    main { padding: 14px 10px 48px; }
+    .card { padding: 14px; border-radius: 10px; }
+    .row {
+      grid-template-columns: 1fr;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+    .row label { font-size: 12px; color: #64748b; }
+    .row input { font-size: 13px; }
+    .copy-btn { justify-self: start; padding: 5px 10px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="home-btn" href="../index.html">← 首页</a>
+  <h1>网页工具库</h1>
+</header>
+
+<main>
+  <section class="card">
+    <h2>浮点数进制转换</h2>
+    <p class="desc">
+      输入十进制浮点数，或直接编辑任意一行的二进制 / 十六进制值，其余各行会自动同步转换。
+      计算遵循 IEEE 754 标准，全部在浏览器本地完成。
+    </p>
+
+    <!-- ============ 输入 ============ -->
+    <div class="group">
+      <div class="group-title">输入的浮点数</div>
+      <div class="row">
+        <label for="dec">浮点数（十进制）</label>
+        <input id="dec" type="text" spellcheck="false" autocomplete="off"
+               autocapitalize="off" autocorrect="off"
+               placeholder="例如：3.14、-0.1、1.5e-3">
+        <button class="copy-btn" type="button" data-target="dec">复制</button>
+      </div>
+    </div>
+
+    <!-- ============ Float 单精度 ============ -->
+    <div class="group">
+      <div class="group-title">Float 单精度 <span class="tag">32 bit</span></div>
+      <div class="row">
+        <label for="f32-dec">浮点数（十进制）</label>
+        <input id="f32-dec" type="text" spellcheck="false" autocomplete="off"
+               autocapitalize="off" autocorrect="off">
+        <button class="copy-btn" type="button" data-target="f32-dec">复制</button>
+      </div>
+      <div class="row">
+        <label for="f32-bin">二进制（32 位）</label>
+        <input id="f32-bin" type="text" spellcheck="false" autocomplete="off"
+               autocapitalize="off" autocorrect="off">
+        <button class="copy-btn" type="button" data-target="f32-bin">复制</button>
+      </div>
+      <div class="row">
+        <label for="f32-hex">十六进制（8 位）</label>
+        <input id="f32-hex" type="text" spellcheck="false" autocomplete="off"
+               autocapitalize="off" autocorrect="off">
+        <button class="copy-btn" type="button" data-target="f32-hex">复制</button>
+      </div>
+    </div>
+
+    <!-- ============ Double 双精度 ============ -->
+    <div class="group">
+      <div class="group-title">Double 双精度 <span class="tag">64 bit</span></div>
+      <div class="row">
+        <label for="f64-dec">浮点数（十进制）</label>
+        <input id="f64-dec" type="text" spellcheck="false" autocomplete="off"
+               autocapitalize="off" autocorrect="off">
+        <button class="copy-btn" type="button" data-target="f64-dec">复制</button>
+      </div>
+      <div class="row">
+        <label for="f64-bin">二进制（64 位）</label>
+        <input id="f64-bin" type="text" spellcheck="false" autocomplete="off"
+               autocapitalize="off" autocorrect="off">
+        <button class="copy-btn" type="button" data-target="f64-bin">复制</button>
+      </div>
+      <div class="row">
+        <label for="f64-hex">十六进制（16 位）</label>
+        <input id="f64-hex" type="text" spellcheck="false" autocomplete="off"
+               autocapitalize="off" autocorrect="off">
+        <button class="copy-btn" type="button" data-target="f64-hex">复制</button>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="btn-sample" type="button">示例：0.1</button>
+      <button class="btn btn-ghost" id="btn-clear" type="button">清空</button>
+    </div>
+
+    <div class="status" id="status" role="status" aria-live="polite"></div>
+  </section>
+
+  <section class="card notes">
+    <h2>说明</h2>
+    <ul>
+      <li>
+        IEEE 754 位布局：单精度 32 位 = 1 位符号 + 8 位阶码 + 23 位尾数；
+        双精度 64 位 = 1 位符号 + 11 位阶码 + 52 位尾数。
+      </li>
+      <li>
+        二进制输入不足位数时自动在左侧补 <code>0</code>；十六进制输入可省略 <code>0x</code> 前缀，大小写不限。
+      </li>
+      <li>
+        十进制显示采用「能唯一还原该数值的最短十进制串」。因此 32 位与 64 位的 0.1
+        十进制显示可能相同，但它们的二进制 / 十六进制位模式不同（这正是精度差异的体现）。
+      </li>
+      <li>
+        最上方「输入的浮点数」与 double 十进制行在数值上等价，属于设计上的对照冗余。
+      </li>
+      <li>
+        不支持 NaN 与 Infinity 之间的互相转换：若输入的十进制数值超出 float 单精度范围，
+        单精度部分会显示为 <code>Infinity</code>；若输入的位模式表示 Infinity / NaN，则会给出错误提示。
+      </li>
+      <li>
+        全部运算在本地浏览器完成，不联网、不上传任何数据。
+      </li>
+      <li>
+        复制优先调用 Clipboard API；若浏览器在 <code>file://</code> 环境下限制该接口，
+        会自动回退到 <code>document.execCommand('copy')</code>。两者均被拒绝时请手动选中后按 Ctrl+C。
+      </li>
+    </ul>
+  </section>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============================================================
+   * 常量与元素引用
+   * ============================================================ */
+
+  // 7 行的 id，顺序与页面一致
+  var ROW_IDS = ['dec', 'f32-dec', 'f32-bin', 'f32-hex', 'f64-dec', 'f64-bin', 'f64-hex'];
+
+  var inputs = {};                                  // id -> input 元素
+  var statusEl = document.getElementById('status');
+
+  // 复用 DataView，避免每次转换都重新分配内存
+  var f32View = new DataView(new ArrayBuffer(4));
+  var f64View = new DataView(new ArrayBuffer(8));
+
+  /* ============================================================
+   * 状态提示
+   * ============================================================ */
+  function setStatus(message, type) {
+    statusEl.textContent = message || '';
+    statusEl.className = type ? 'status ' + type : 'status';
+  }
+
+  /* ============================================================
+   * 解析：输入字符串 -> JavaScript 数值（double）
+   * 解析失败时抛出带有中文提示的 Error
+   * ============================================================ */
+
+  // 十进制浮点数
+  function parseDecimal(text) {
+    var s = text.trim();
+    if (s === '') {
+      throw new Error('输入为空');
+    }
+    if (!/^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/.test(s)) {
+      throw new Error('十进制浮点数格式不正确，示例：3.14、-0.1、1.5e-3');
+    }
+    var v = Number(s);
+    if (!Number.isFinite(v)) {
+      throw new Error('数值超出可表示范围，不支持 Infinity / NaN');
+    }
+    return v;
+  }
+
+  // 二进制字符串 -> 补齐到指定长度的二进制串
+  function parseBinaryString(text, bits) {
+    var s = text.trim().replace(/\s+/g, '');
+    if (s === '') {
+      throw new Error('输入为空');
+    }
+    if (!/^[01]+$/.test(s)) {
+      throw new Error('二进制只能包含 0 和 1');
+    }
+    if (s.length > bits) {
+      throw new Error('二进制位数不能超过 ' + bits + ' 位（当前 ' + s.length + ' 位）');
+    }
+    return s.length === bits ? s : new Array(bits - s.length + 1).join('0') + s;
+  }
+
+  // 十六进制字符串 -> 补齐到指定长度的十六进制串
+  function parseHexString(text, digits) {
+    var s = text.trim().replace(/\s+/g, '');
+    if (s === '') {
+      throw new Error('输入为空');
+    }
+    s = s.replace(/^0[xX]/, '');
+    if (s === '') {
+      throw new Error('输入为空');
+    }
+    if (!/^[0-9a-fA-F]+$/.test(s)) {
+      throw new Error('十六进制只能包含 0-9 和 A-F');
+    }
+    if (s.length > digits) {
+      throw new Error('十六进制位数不能超过 ' + digits + ' 位（当前 ' + s.length + ' 位）');
+    }
+    return s.length === digits ? s : new Array(digits - s.length + 1).join('0') + s;
+  }
+
+  // 位模式解析出 Infinity / NaN 时统一拦截
+  function ensureFinite(value, name) {
+    if (!Number.isFinite(value)) {
+      throw new Error('该位模式表示 ' + name + ' 的 Infinity 或 NaN，暂不支持转换');
+    }
+    return value;
+  }
+
+  // 根据行的 id 和文本，解析出对应的数值
+  function valueFromRow(rowId, text) {
+    switch (rowId) {
+      case 'dec':
+      case 'f64-dec':
+        return parseDecimal(text);
+
+      case 'f32-dec': {
+        var dv = parseDecimal(text);
+        var fv = Math.fround(dv);
+        if (!Number.isFinite(fv)) {
+          throw new Error('该数值超出 float 单精度可表示范围');
+        }
+        return fv;
+      }
+
+      case 'f32-bin': {
+        var bin32 = parseBinaryString(text, 32);
+        f32View.setUint32(0, parseInt(bin32, 2), false);
+        return ensureFinite(f32View.getFloat32(0, false), 'float 单精度');
+      }
+
+      case 'f32-hex': {
+        var hex8 = parseHexString(text, 8);
+        f32View.setUint32(0, parseInt(hex8, 16), false);
+        return ensureFinite(f32View.getFloat32(0, false), 'float 单精度');
+      }
+
+      case 'f64-bin': {
+        var bin64 = parseBinaryString(text, 64);
+        f64View.setBigUint64(0, BigInt('0b' + bin64), false);
+        return ensureFinite(f64View.getFloat64(0, false), 'double 双精度');
+      }
+
+      case 'f64-hex': {
+        var hex16 = parseHexString(text, 16);
+        f64View.setBigUint64(0, BigInt('0x' + hex16), false);
+        return ensureFinite(f64View.getFloat64(0, false), 'double 双精度');
+      }
+    }
+    throw new Error('未知的输入行');
+  }
+
+  /* ============================================================
+   * 格式化：数值 -> 各进制字符串
+   * ============================================================ */
+
+  // double 的最短十进制表示
+  function formatFloat64(d) {
+    if (!Number.isFinite(d)) {
+      return String(d);                       // Infinity / -Infinity
+    }
+    if (d === 0) {
+      return Object.is(d, -0) ? '-0' : '0';
+    }
+    return String(d);
+  }
+
+  // float32 的最短十进制表示：从 1 位有效数字开始尝试，
+  // 找到第一个能通过 Math.fround 还原回同一 float32 的字符串
+  function formatFloat32(f) {
+    if (!Number.isFinite(f)) {
+      return String(f);
+    }
+    if (f === 0) {
+      return Object.is(f, -0) ? '-0' : '0';
+    }
+    for (var p = 1; p <= 9; p++) {
+      var s = String(Number(f.toPrecision(p)));
+      if (Math.fround(Number(s)) === f) {
+        return s;
+      }
+    }
+    return String(f);
+  }
+
+  /* ============================================================
+   * 渲染：把源数值同步到其余 6 行
+   * ============================================================ */
+  function renderAll(sourceId, value) {
+    var f32 = Math.fround(value);
+
+    // 单精度位模式
+    f32View.setFloat32(0, f32, false);
+    var bits32 = f32View.getUint32(0, false);
+
+    // 双精度位模式
+    f64View.setFloat64(0, value, false);
+    var bits64 = f64View.getBigUint64(0, false);
+
+    var outputs = {
+      'dec':     formatFloat64(value),
+      'f32-dec': formatFloat32(f32),
+      'f32-bin': bits32.toString(2),
+      'f32-hex': bits32.toString(16).toUpperCase(),
+      'f64-dec': formatFloat64(value),
+      'f64-bin': bits64.toString(2),
+      'f64-hex': bits64.toString(16).toUpperCase()
+    };
+
+    // 二进制 / 十六进制补足到固定宽度
+    outputs['f32-bin'] = padLeft(outputs['f32-bin'], 32);
+    outputs['f32-hex'] = padLeft(outputs['f32-hex'], 8);
+    outputs['f64-bin'] = padLeft(outputs['f64-bin'], 64);
+    outputs['f64-hex'] = padLeft(outputs['f64-hex'], 16);
+
+    for (var i = 0; i < ROW_IDS.length; i++) {
+      var id = ROW_IDS[i];
+      if (id === sourceId) {
+        continue;                              // 不覆盖用户正在编辑的那一行
+      }
+      inputs[id].value = outputs[id];
+    }
+  }
+
+  function padLeft(str, width) {
+    while (str.length < width) {
+      str = '0' + str;
+    }
+    return str;
+  }
+
+  /* ============================================================
+   * 输入处理
+   * ============================================================ */
+  function processInput(rowId) {
+    var text = inputs[rowId].value;
+
+    // 清空某一行 -> 其余行一并清空
+    if (text.trim() === '') {
+      for (var i = 0; i < ROW_IDS.length; i++) {
+        if (ROW_IDS[i] !== rowId) {
+          inputs[ROW_IDS[i]].value = '';
+        }
+      }
+      setStatus('');
+      return;
+    }
+
+    var value;
+    try {
+      value = valueFromRow(rowId, text);
+    } catch (err) {
+      // 解析失败时保留其他行的上一次结果，只提示错误，避免打断输入过程
+      setStatus(err.message, 'error');
+      return;
+    }
+
+    renderAll(rowId, value);
+
+    // 数值超出单精度范围时给出提示
+    if (!Number.isFinite(Math.fround(value))) {
+      setStatus('提示：该数值超出 float 单精度可表示范围，单精度部分显示为 Infinity。', 'warn');
+    } else {
+      setStatus('');
+    }
+  }
+
+  /* ============================================================
+   * 复制到剪贴板
+   * ============================================================ */
+
+  // 回退方案：临时 textarea + execCommand（在 file:// 下通常仍可用）
+  function legacyCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-9999px';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, text.length);
+
+    var ok = false;
+    try {
+      ok = document.execCommand('copy');
+    } catch (e) {
+      ok = false;
+    }
+    document.body.removeChild(ta);
+
+    if (!ok) {
+      throw new Error('浏览器未授权剪贴板操作');
+    }
+  }
+
+  function copyToClipboard(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text)['catch'](function () {
+        legacyCopy(text);                      // 失败则回退
+      });
+    }
+    try {
+      legacyCopy(text);
+      return Promise.resolve();
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+
+  /* ============================================================
+   * 事件绑定
+   * ============================================================ */
+
+  // 收集输入框并绑定 input 事件
+  ROW_IDS.forEach(function (id) {
+    var el = document.getElementById(id);
+    inputs[id] = el;
+    el.addEventListener('input', function () {
+      processInput(id);
+    });
+  });
+
+  // 复制按钮
+  var copyButtons = document.querySelectorAll('.copy-btn');
+  Array.prototype.forEach.call(copyButtons, function (btn) {
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-target');
+      var source = inputs[targetId];
+      var text = source ? source.value : '';
+
+      if (!text) {
+        setStatus('没有可复制的内容', 'error');
+        return;
+      }
+
+      copyToClipboard(text).then(function () {
+        setStatus('已复制：' + text, 'ok');
+      })['catch'](function (err) {
+        setStatus('复制失败：' + err.message + '，请手动选中后按 Ctrl+C。', 'error');
+      });
+    });
+  });
+
+  // 示例按钮：填入 0.1（能直观体现单/双精度的差异）
+  document.getElementById('btn-sample').addEventListener('click', function () {
+    inputs['dec'].value = '0.1';
+    processInput('dec');
+    inputs['dec'].focus();
+  });
+
+  // 清空按钮
+  document.getElementById('btn-clear').addEventListener('click', function () {
+    ROW_IDS.forEach(function (id) {
+      inputs[id].value = '';
+    });
+    setStatus('');
+    inputs['dec'].focus();
+  });
+
+})();
+</script>
+</body>
+</html>
